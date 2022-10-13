@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { CardContent, Typography, CardActions, TextField, Button, List, ListItem, ListItemButton, ListItemText, Box, Drawer, Backdrop, Card } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu';
@@ -27,7 +27,7 @@ const Course = () => {
 
     const [state, setState] = React.useState({ left: false });
     const [open, setOpen] = React.useState(false);
-    const [course,setCourse]=React.useState({})
+    const [course, setCourse] = React.useState({})
 
     useEffect(() => {
         Axios.get("https://61ef7787732d93001778e3c3.mockapi.io/course").then((response) => {
@@ -107,7 +107,7 @@ const Course = () => {
                 open={open}
             // onClick={handleClose}
             >
-                <Card sx={{ minWidth: 575 ,height:"20rem" }}>
+                <Card sx={{ minWidth: 575, height: "20rem" }}>
                     <CardContent>
                         <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
                             Course Details Portal
@@ -121,7 +121,7 @@ const Course = () => {
                             />
                             {/* <Typography sx={{ fontSize: 14}}> Select Staff</Typography> */}
                             <Select
-                                style={{  marginTop: "1%" }}
+                                style={{ marginTop: "1%" }}
                                 isMulti
                                 options={options}
                                 closeMenuOnSelect={false}
@@ -131,7 +131,7 @@ const Course = () => {
                         </div>
 
                     </CardContent>
-                    <CardActions  style={{marginTop:"7rem" ,justifyContent:'center'}}>
+                    <CardActions style={{ marginTop: "7rem", justifyContent: 'center' }}>
                         <Button variant="contained"> Add Course </Button>
                         <Button variant="contained" onClick={handleClose} > Cancel </Button>
 
