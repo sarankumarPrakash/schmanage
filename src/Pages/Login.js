@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Card, CardActions, CardContent, Typography, Button, TextField } from '@mui/material';
 import Axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './index.css'
 
 
 
@@ -28,12 +29,9 @@ const Login = () => {
 
         for (let value in details)
             if (details[value]) {
-                console.log(details[value].name, details[value].password);
                 if (data.email === details[value]?.email) {
                     if (data.password === details[value]?.password) {
-                        console.log(details[value]?.email, details[value]?.password)
                         navigate('/student')
-                        console.log('data');
                     }
                 }
             }
@@ -46,13 +44,13 @@ const Login = () => {
     return (
         <div>
 
-            <Card sx={{ width:'50%',marginLeft:'24%',marginTop:'8%' }}>
+            <Card sx={{ width:'32%',marginLeft:'34%',marginTop:'8%' }}>
                 <CardContent>
                     <Typography sx={{ fontSize: 18,marginLeft:'42%',marginBottom:"2%" }} color="text.secondary" gutterBottom>
                         Sign in 
                     </Typography>
-
-                    <TextField
+           <div className='login'>
+           <TextField
                         style={{ width: '20rem', marginBottom: "3%", marginRight: "3%" }}
                         variant='outlined'
                         name="email"
@@ -69,11 +67,12 @@ const Login = () => {
 
                     />
 
+           </div>
+                 
                 </CardContent>
                 <CardActions style={{justifyContent:'center'}}>
-                    <Button size="small" onClick={handleSubmit}> Login</Button>
-                    <Button size="small" onClick={()=>navigate('/register')}> Register</Button>
-
+                    <Button   style={{textTransform:"lowercase"}} onClick={handleSubmit}> Login</Button>
+                    <Button  style={{textTransform:"lowercase"}} onClick={()=>navigate('/register')}> new User..</Button>
                 </CardActions>
             </Card>
 

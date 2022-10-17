@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { CardContent, Typography, CardActions, TextField, Button, List, ListItem, ListItemButton, ListItemText, Box, Drawer, Backdrop, Card } from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu';
-import { useNavigate } from 'react-router-dom';
+import { Snackbar,CardContent, Typography, CardActions, TextField, Button, Backdrop, Card } from '@mui/material'
 import Axios from 'axios';
-
+import DrawerToggle from './DrawerToggle';
 import '../App.css'
+
+
+
 const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'name', headerName: 'Staff Name ', width: 270 },
@@ -18,7 +19,6 @@ const columns = [
 
 
 const Staff = () => {
-    const navigate = useNavigate();
     const [state, setState] = React.useState({ left: false });
     const [open, setOpen] = React.useState(false);
     const [data, setData] = React.useState({})
@@ -30,7 +30,6 @@ const Staff = () => {
 
         setState({ ...state, [anchor]: open });
     };
-    console.log(staff);
     useEffect(() => {
         Axios.get("https://61ef7787732d93001778e3c3.mockapi.io/Staff").then((response) => {
             let result = response.data;
@@ -46,35 +45,7 @@ const Staff = () => {
         }
     }
 
-    const list = (anchor) => (
-        <Box
-            sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
-            role="presentation"
-            onClick={toggleDrawer(anchor, false)}
-            onKeyDown={toggleDrawer(anchor, false)}
-        >
-            <List>
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary={'Student Portal'} onClick={() => navigate('/student')} />
-
-                    </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary={'Course Portal'} onClick={() => navigate('/course')} />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                    <ListItemButton>
-
-                        <ListItemText primary={'Staff portal'} onClick={() => navigate('/staff')} />
-                    </ListItemButton>
-                </ListItem>
-            </List>
-
-        </Box>
-    )
+    
     const handleClose = () => {
         setOpen(false);
     };
@@ -82,21 +53,27 @@ const Staff = () => {
         setOpen(!open);
     };
     const handleSubmit = () => {
-        console.log(data)
-        handleClose()
+        Axios.post("https://61ef7787732d93001778e3c3.mockapi.io/register",
+        {
+            name: data.userName, email: data.email, number: data.number,
+            dob: data.dob
+         })
+        .then(
+            (response) => {
+                if (response.status === 201) {
+                    handleClose();
+                    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                        This is a success message!
+                    </Snackbar>
+
+                }
+            });       
     }
 
 
     return (
         <div>
-            <MenuIcon onClick={toggleDrawer('left', true)} style={{ marginLeft: '2rem', marginTop: '4rem' }} />
-            <Drawer
-                anchor={'left'}
-                open={state['left']}
-                onClose={toggleDrawer('left', false)}
-            >
-                {list('left')}
-            </Drawer>
+           <DrawerToggle />
             <Button style={{ float: 'right', marginRight: '4rem', marginTop: '4rem', marginBottom: '2rem' }} variant="contained" onClick={handleToggle} > Add Staff </Button>
 
             <DataGrid
@@ -106,8 +83,6 @@ const Staff = () => {
                 rowsPerPemailOptions={[5]}
                 checkboxSelection
             />
-
-
 
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -133,7 +108,6 @@ const Staff = () => {
                                 variant='outlined'
                                 name="email"
                                 onChange={handleChange}
-
                                 label="Enter Email"
                             />
 

@@ -1,5 +1,27 @@
-Button{
-    /* width: 9%; */
-     color: yellow;
-    /* margin-left: 79rem; */
-  }
+body{
+  background-color: bisque;
+
+}
+.text{
+  margin-left: 12%;
+}
+.textfield{
+  width: '20rem';
+  margin-bottom: "3%";
+  margin-right: "3%"
+}
+.card{
+  align-items: center;
+}
+.login{
+  margin-left: 14%;
+}
+.button{
+  text-transform: capitalize;
+}
+.dropdown{
+ width:20rem;
+ float:right;
+ /* margin-left: -5rem; */
+ margin-right: 5rem;
+}

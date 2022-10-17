@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Snackbar, CardContent, Typography, CardActions, TextField, Button, List, ListItem, ListItemButton, ListItemText, Box, Drawer, Backdrop, Card } from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu';
-import { useNavigate } from 'react-router-dom';
+import { Snackbar,IconButton, CardContent, Typography, CardActions, TextField, Button, Backdrop, Card } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Menu';
 import { Dropzone, FileItem } from "@dropzone-ui/react";
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated';
 import '../App.css'
 import Axios from 'axios';
+import DrawerToggle from './DrawerToggle';
+
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'id', headerName: 'ID', width: 100 },
     { field: 'name', headerName: 'Student Name ', width: 150 },
     { field: 'email', headerName: 'Email ', width: 120 },
     { field: 'dob', headerName: 'Date of Birth', width: 120, },
@@ -23,89 +24,32 @@ const columns = [
 ];
 
 
-const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-]
+
 
 const Student = () => {
-    const navigate = useNavigate();
     const animatedComponents = makeAnimated();
 
-    const [state, setState] = React.useState({ left: false });
     const [open, setOpen] = React.useState(false);
     const [file, setFile] = React.useState([])
     const [student, setStudent] = React.useState({})
+    const [staff, setStaff] = React.useState({})
+    const [coursename, setCoursename] = React.useState([])
     const [data, setData] = React.useState({})
-
 
     useEffect(() => {
         Axios.get("https://61ef7787732d93001778e3c3.mockapi.io/student").then((response) => {
             let result = response.data;
             setStudent(result);
         });
+
+
+        Axios.get("https://61ef7787732d93001778e3c3.mockapi.io/course").then((response) => {
+            let fresult = response.data;
+            // setSubject(fresult.map((value)=>{return {'course':value.coursename}}))
+            setCoursename(fresult.map((data)=>{return {'value' : data.coursename , 'label' :data.coursename ,'staff':data.staffName}}))
+        });
+      
     }, []);
-    console.log(data)
-    const handleStudent = (e) => {
-        console.log(data.name[0]);
-        Axios.post("https://61ef7787732d93001778e3c3.mockapi.io/register",
-            {
-                name:data.name,email:data.email,dob:data.dob,
-                bloodgroup:data.bloodgroup,fathername:data.fathername,mothername:data.mothername,
-                address:data.address,username:data.name
-            })
-            .then(
-                (response) => {
-                    console.log(response)
-                    if (response.status == 201) {
-                        handleClose();
-                        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                                This is a success message!
-                            
-                        </Snackbar>
-
-                    }
-                });
-    };
-
-    const toggleDrawer = (anchor, open) => (event) => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
-
-        setState({ ...state, [anchor]: open });
-    };
-
-    const list = (anchor) => (
-        <Box
-            sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
-            role="presentation"
-            onClick={toggleDrawer(anchor, false)}
-            onKeyDown={toggleDrawer(anchor, false)}
-        >
-            <List>
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary={'Student Portal'} onClick={() => navigate('/student')} />
-
-                    </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary={'Course Portal'} onClick={() => navigate('/course')} />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                    <ListItemButton>
-
-                        <ListItemText primary={'Staff portal'} onClick={() => navigate('/staff')} />
-                    </ListItemButton>
-                </ListItem>
-            </List>
-
-        </Box>
-    )
     const handleClose = () => {
         setOpen(false);
     };
@@ -114,39 +58,73 @@ const Student = () => {
     };
     const updateFiles = (incommingFiles) => {
         setFile(incommingFiles);
+        setData({...data,'file':incommingFiles.files})
+     
     };
+
+    const action = (
+        <React.Fragment>
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </React.Fragment>
+      );
+    const handleStudent = (e) => {
+        Axios.post("https://61ef7787732d93001778e3c3.mockapi.io/register",
+            {
+                name: data.name, email: data.email, dob: data.dob,
+                bloodgroup: data.bloodgroup, fathername: data.fathername, mothername: data.mothername,
+                address: data.address, username: data.name ,course:data.course,file:data.file
+            })
+            .then(
+                (response) => {
+                    console.log(response)
+                    if (response.status === 201) {
+                        <Snackbar
+                        open={open}
+                        autoHideDuration={6000}
+                        onClose={handleClose}
+                        message="Student Details Added sucessfully"
+                        action={action}
+                      />
+                      handleClose()
+
+                    }
+                });
+    };
+ 
     const handleChange = (e) => {
         if (e != undefined) {
-            setData({
-                ...data,
-                [e.target.name]: e.target.value,
-            });
+            if(e?.target?.name){
+                setData({...data,[e.target.name]: e.target.value, });
+            }else{
+                let value=(e.map((data)=>{return data.value}));
+                if(value){
+                  let staffData =(coursename.filter((data)=>{return data.value===value[0]}))
+                  staffData=(staffData.map((data)=>{return data.staff})) 
+                  setStaff(staffData.join(','));
+                  setData({ ...data,'course':value[0]})
+            }
         }
+        }
+    
+        
     }
-
-    console.log(data)
-
     return (
         <div>
-            <MenuIcon onClick={toggleDrawer('left', true)} style={{ marginLeft: '2rem', marginTop: '4rem' }} />
-            <Drawer
-                anchor={'left'}
-                open={state['left']}
-                onClose={toggleDrawer('left', false)}
-            >
-                {list('left')}
-            </Drawer>
+            <DrawerToggle />
             <Button style={{ float: 'right', marginRight: '4rem', marginTop: '4rem', marginBottom: '2rem' }} variant="contained" onClick={handleToggle} > Add Student </Button>
 
             <DataGrid
                 style={{ height: 400, width: '100%' }}
                 rows={student}
                 columns={columns}
-                rowsPerPemailOptions={[5]}
-                checkboxSelection
             />
-
-
 
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -221,38 +199,40 @@ const Student = () => {
 
                         <div>
                             <TextField
-                                style={{ width: '20rem', marginBottom: "3%", marginRight: "3%", float: 'left' }}
+                                style={{ width: '20rem', marginBottom: "3%", marginRight: "1%", float: 'left' }}
                                 variant='outlined'
-                                name="courseName"
-                                label="Course Name"
+                                name="staffName"
+                                label="staff Name"
+                                value={staff.length>0 ? staff:""}
                                 onChange={handleChange}
-
                             />
+                            <div className='dropdown'>
                             <Select
-                                style={{ width: '89%', marginTop: "1%" }}
+                                style={{ width: '20rem', marginTop: "1%" }}
                                 isMulti
+                                placeholder="Enter your course"
                                 name="course"
-                                options={options}
-                                closeMenuOnSelect={false}
+                                options={coursename}
                                 components={animatedComponents}
-                                // onChange={handleChange}
-
-
+                                onChange={handleChange}
                             />
+                            </div>
                         </div>
-                        <div>
-                            <Dropzone onChange={updateFiles} value={file} style={{ width: '20rem', minHeight: '9rem', marginTop: '1rem' }}>
-                                {file.map((file) => (
+                        <div >
+                            <Dropzone onChange={updateFiles}  style={{ width: '42rem', minHeight: '9rem', marginTop: '1rem' }}>
+                              <div style={{minHeight:'-2rem'}}>
+                              {file.map((file) => (
                                     <FileItem {...file} preview
-                                        onChange={handleChange}
                                     />
                                 ))}
+                              </div>
+                                
                             </Dropzone>
                         </div>
 
 
                     </CardContent>
-                    <CardActions style={file.length === 0 ? { marginTop: "5rem", justifyContent: 'center' } : { marginTop: "-0.9rem", justifyContent: 'center' }}>
+                    <CardActions style={ { marginTop: "4rem", justifyContent: 'center' }}>
                         <Button variant="contained" onClick={handleStudent} > Add Student </Button>
                         <Button variant="contained" onClick={handleClose} > Cancel </Button>
 
